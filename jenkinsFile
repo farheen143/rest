@@ -1,0 +1,32 @@
+ node
+ {
+ stage('CheckoutCode')
+  {
+ git credentialsId: '44f7aa89-f5d6-4652-8d07-252f53df8152', url: 'https://github.com/farheen143/maven-web-application.git'
+  }
+  stage('Build')
+ {
+  sh "mvn clean package"
+ }
+  stage('ExecuteSonarQubeReport')
+ {
+  sh "mvn sonar:sonar"
+ }
+ stage('UploadArtifactIntoNexus')
+ {
+  sh "mvn deploy"
+ }
+   stage('DeployToTomcat')
+ {
+  
+ sshagent(['c5312531-0dcb-492a-859b-f5c4f41dbe56'])
+  {
+   sh  "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@3.144.163.69:/opt/tomcat8/webapps/maven-web-application.war"
+  }
+ }
+  stage('gmals')
+ {
+     emailext body: 'asdasdasdasdasdasdasd', subject: 'sree', to: 'aurora.g00gle1@gmail.com'
+ }
+ 
+  }
